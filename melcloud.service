@@ -1,0 +1,17 @@
+[Unit]
+Description=MELCloud
+After=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/opt/mqtt-melcloud
+ExecStart=/usr/bin/node index.js
+Restart=on-failure
+CPUAccounting=true
+CPUQuota=10%
+MemoryAccounting=true
+MemoryLimit=50M
+Type=exec
+
+[Install]
+WantedBy=multi-user.target

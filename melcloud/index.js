@@ -84,7 +84,7 @@ class Cloud extends EventEmitter {
 			uri: 'https://app.melcloud.com/Mitsubishi.Wifi.Client/Login/ClientLogin',
 			method: 'POST',
 			form: {
-				AppVersion: '1.9.3.0',
+				AppVersion: '1.25.0.1',
 				CaptchaChallenge: '',
 				CaptchaResponse: '',
 				Email: username,
@@ -115,6 +115,8 @@ class Cloud extends EventEmitter {
 	}
 
 	attach(data, location) {
+		if (!data) return; //empty device
+
 		const known = this.devices.some((device) => {
 			return device.id === data.DeviceID && device.building === data.BuildingID;
 		});
@@ -140,24 +142,25 @@ class Cloud extends EventEmitter {
 		return this.request({ url, method })
 			.then((response) => JSON.parse(response.body))
 			.then((locations) => {
+				let result  = []
 				const devices = locations.reduce((result, location) => {
 					location.Structure.Devices
 						.forEach((device) => result.push({ device, location }));
 
 					location.Structure.Floors.forEach((floor) => {
-						result.push({ device: floor.Devices, location });
-
+						result.push(...floor.Devices.map((d) => { return {device: d, location} }));
+						
 						floor.Areas
-							.forEach((area) => result.area({ device: area.Devices, location }));
+							.forEach((area) => result.push(...area.Devices.map((d) => { return {device: d, location} })));
 					});
 
 					location.Structure.Areas
-						.forEach((area) => result.push({ device: area.Devices, location }));
+						.forEach((area) => result.push(...area.Devices.map((d) => { return {device: d, location} })));
 
 					return result;
 				}, []);
 
-				devices.forEach(({ device, location }) => this.attach(device, location));
+				devices.forEach((d) => this.attach(d.device, d.location));
 			})
 			.catch((e) => this.emit('error', e));
 	}

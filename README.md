@@ -1,5 +1,5 @@
 # mqtt-melcloud
-MQTT integration for Mitsubishi Melcloud devices
+MQTT integration for Mitsubishi Melcloud devices with Fibaro HC3
 
 ## Docker Compose
 

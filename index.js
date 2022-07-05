@@ -2,6 +2,7 @@ const { connect } = require('mqtt');
 const { melcloud } = require('./melcloud');
 const { config } = require('./config');
 const { version } = require('./package');
+const { logger } = require('./logger.js');
 
 const topics = {
 	state: () => `${config.mqtt.path}/state`,
@@ -34,9 +35,9 @@ const format = (type, args) => [
 	...args,
 ].join(' ');
 
-const log = (type, ...args) => console.log(format(type, args));
+const log = (type, ...args) => logger.info(format(type, args));
 
-const error = (type, ...args) => console.error(format(type, args));
+const error = (type, ...args) => logger.error(format(type, args));
 
 mqtt.on('connect', () => log('mqtt', `connected to ${config.mqtt.host}`));
 
